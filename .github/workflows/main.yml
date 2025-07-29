@@ -1,0 +1,27 @@
+name: Demo
+
+on:
+  push:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Copy files to EC2 and Deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@98.84.151.254 << 'EOF'
+          cd /home/ubuntu/Scientific-Calculator
+          git pull origin main
+          docker build . -t sci-calci
+          docker stop $(docker ps -q --filter ancestor=Sci-Calci) || true
+          docker run -itd -p 3000:3000 --name calculator sci-calci
+        EOF
