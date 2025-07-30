@@ -19,6 +19,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}        
           port: ${{ secrets.EC2_PORT }}          
           script: |
+            git clone "https://github.com/Pavanks618/Scientific-Calculator.git"
             cd ~/Scientific-Calculator || exit 1
             git pull origin main
 
