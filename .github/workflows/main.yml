@@ -20,10 +20,16 @@ jobs:
           port: ${{ secrets.EC2_PORT }}          
           script: |
             sudo apt update && sudo apt install docker.io -y
-            git clone "https://github.com/Pavanks618/Scientific-Calculator.git"
-            cd ~/Scientific-Calculator || exit 1
+            if [ -d "Scientific-Calculator" ]; then
+            echo "Directory exists, pulling latest changes..."
+            cd Scientific-Calculator
             git pull origin main
-
+            else
+            echo "Cloning repository..."
+            git clone "https://github.com/Pavanks618/Scientific-Calculator.git"
+            cd Scientific-Calculator
+            fi
+            
             echo "Stopping and removing old container (if exists)..."
             sudo docker rm -f calculator || true
 
