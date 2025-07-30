@@ -24,13 +24,13 @@ jobs:
             git pull origin main
 
             echo "Stopping and removing old container (if exists)..."
-            docker rm -f calculator || true
+            sudo docker rm -f calculator || true
 
             echo "Removing old image (if exists)..."
-            docker rmi -f sci-calci || true
+            sudo docker rmi -f sci-calci || true
 
             echo "Building Docker image..."
-            docker build -t sci-calci .
+            sudo docker build -t sci-calci .
 
             echo "Running Docker container..."
-            docker run -d -p 3000:80 --name calculator sci-calci
+            sudo docker run -d -p 3000:80 --name calculator sci-calci
