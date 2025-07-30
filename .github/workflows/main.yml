@@ -1,4 +1,4 @@
-name: Local Docker Deploy
+name: Local Docker Deploy via SSH
 
 on:
   push:
@@ -11,20 +11,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: SSH into EC2 and deploy Docker container
-        uses: appleboy/ssh-action@v1.0.0
+      - name: SSH and Deploy Docker Container
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}      
+          key: ${{ secrets.EC2_SSH_KEY }}        
+          port: ${{ secrets.EC2_PORT }}          
           script: |
-            cd ~
-            if [ ! -d "Scientific-Calculator" ]; then
-              git clone https://github.com/Pavanks618/Scientific-Calculator.git
-            fi
-
-            cd Scientific-Calculator || exit 1
+            cd ~/Scientific-Calculator || exit 1
             git pull origin main
 
             echo "Stopping and removing old container (if exists)..."
