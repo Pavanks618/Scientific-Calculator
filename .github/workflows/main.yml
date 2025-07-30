@@ -33,3 +33,45 @@ jobs:
 
             echo "Running Docker container..."
             sudo docker run -d -p 3000:80 --name calculator sci-calci
+name: Local Docker Deploy
+
+on:
+  push:
+    branches:
+      - main  # Trigger only on pushes to main (you can change this)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: SSH into EC2 and deploy Docker container
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~
+            if [ ! -d "Scientific-Calculator" ]; then
+              git clone https://github.com/ubuntu/Scientific-Calculator.git
+            fi
+
+            cd Scientific-Calculator || exit 1
+            git pull origin main
+
+            echo "Stopping and removing old container (if exists)..."
+            sudo docker rm -f calculator || true
+
+            echo "Removing old image (if exists)..."
+            sudo docker rmi -f sci-calci || true
+
+            echo "Building Docker image..."
+            sudo docker build -t sci-calci .
+
+            echo "Running Docker container..."
+            sudo docker run -d -p 3000:80 --name calculator sci-calci
